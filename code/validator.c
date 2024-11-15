@@ -1,59 +1,54 @@
-#include <cs50.h>
 #include <stdio.h>
 
 int main(void)
 {
-
-    long cardn, copy;
-    int i, count = 0, digit, c;
-    int mul, digit1, s1 = 0, s2 = 0, s3;
-    int num[16]; // to store individual digits of the card number
+    
+    long int cardn;
+    int num[16];
+    int s1 = 0, s2 = 0, count = 0;
+    int digit, mul, t;
 
     // Ask user to enter the card number
-    cardn = get_long("Enter card number: "); // get card number from the user
-    copy = cardn;
 
-    // count number of digits in the card number
-    while (copy > 0)
+    printf("Enter card number: ");
+    scanf("%ld", &cardn);
+
+    // store the individual digits into a variable and count the number of digits
+
+    while (cardn > 0)
     {
+        digit = cardn % 10;
+        num[count] = digit;
+        cardn /= 10;
         count++;
-        copy /= 10;
     }
-    c = count;
-    if (c > 16 || c < 13)
+
+    // Validate the length
+    // and end the program if the length is less than 13 or more than 16
+
+    if (count < 13 || count > 16)
     {
         printf("INVALID\n");
         return 0;
     }
 
-    // store individual digits into a variable
-    count--;
-    while (count >= 0)
+    // Identify Card Type
+
+    if ((num[count - 1]) == 4 && (count == 13 || count == 16))
     {
-        digit = cardn % 10;
-        num[count] = digit;
-        cardn /= 10;
-        count--;
-    }
-
-    // Identify Card type
-
-    if ((num[0] == 4) && (c == 13 || c == 16))
-    {
-
         printf("VISA\n");
     }
-
-    else if ((num[0] == 3) && (num[1] == 4 || num[1] == 7) && (c == 15))
+    else if (num[count - 1] == 3 && (num[count - 2] == 4 || num[count - 2] == 7) && count == 15)
     {
         printf("AMEX\n");
     }
-
-    else if ((num[0] == 5) && (num[1] >= 1 && num[1] <= 5) && (c == 16))
+    else if (num[count - 1] == 5 && num[count - 2] >= 1 && num[count - 2] <= 5)
     {
         printf("MASTERCARD\n");
     }
-
+    else if (num[count-1]==6 && count==16){
+        printf("DISCOVER\n");
+    }
     else
     {
         printf("INVALID\n");
@@ -61,18 +56,16 @@ int main(void)
     }
 
     // luhn's algorithm
-    c--; // decrement counter by 1 because the digits are stored from num[0] to num[Total digits in
-         // card number-1]
-    while (c >= 0)
-    {
 
-        // sum of alt digits
-        if (c % 2 == 1) // to get second-to-last digit and every other digit
+    for (int i = 0; i < count; i++)
+    {
+        if (i % 2 == 1)
         {
-            mul = num[c] * 2;
+            mul = num[i] * 2;  // doublinng every other digit from second-to-last
+
             if (mul > 9)
             {
-                s1 = s1 + mul - 9;
+                s1 = s1 + mul - 9; // If the product is greater than 9 i.e. double digit, subtract nine
             }
             else
             {
@@ -82,20 +75,21 @@ int main(void)
 
         else
         {
-            s2 = s2 + num[c]; // adding the digits that weren't multiplied by 2
+            s2 += num[i];  // Sum the digits that weren't multiplied by 2
         }
+    }
 
-        c--;
-    }
-    s3 = s1 + s2;
-    // check and print whether the given number is valid or not by finding if last digit of sum is zero or not
-    if (s3 % 10 == 0)
-    {
-        printf("VALID\n");
-    }
-    else
-    {
-        printf("INVALID\n");
-    }
+// Check Validity
+
+if((s1+s2)%10==0){
+    printf("VALID\n");
+}
+else{
+printf("INVALID\n");
+}
+printf("\n");
+    
     return 0;
 }
+
+
